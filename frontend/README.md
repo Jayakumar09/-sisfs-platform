@@ -1,26 +1,43 @@
-# SISFS Frontend Simple
+# SISFS Frontend
 
-A simple React + Vite frontend for the SISFS backend.
+Solar Installation System Finance System - React + Vite frontend application.
 
 ## Setup
 
-1. Copy `.env.example` to `.env`
-2. Update `VITE_API_URL` if needed
-3. Install dependencies:
+1. Install dependencies:
    ```bash
    npm install
    ```
-4. Run development server:
+
+2. Run development server:
    ```bash
    npm run dev
    ```
 
-## Connected APIs
+The frontend runs on `http://localhost:3000` and connects to the backend API at `http://localhost:5000`.
 
-- POST `/api/auth/register`
-- POST `/api/auth/login`
-- GET `/api/auth/me`
-- GET `/api/leads`
-- POST `/api/leads`
-- PUT `/api/leads/:id`
-- DELETE `/api/leads/:id`
+## Admin Login
+
+- **Email:** `admin@sisfs.com`
+- **Password:** `admin123`
+
+## API Endpoints
+
+### Auth
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login with email/password
+- `GET /api/auth/me` - Get current user (authenticated)
+
+### Leads
+- `GET /api/leads` - List leads (authenticated)
+- `POST /api/leads` - Create lead (authenticated)
+- `PUT /api/leads/:id` - Update lead (authenticated)
+- `DELETE /api/leads/:id` - Delete lead (authenticated)
+
+## Tech Stack
+
+- React 18
+- Vite
+- React Router v6
+- Axios
+- Tailwind CSS
