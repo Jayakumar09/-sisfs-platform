@@ -1,0 +1,99 @@
+const prisma = require("../config/db");
+const bcrypt = require("bcryptjs");
+const { generateToken } = require("../utils/token");
+
+// REGISTER
+exports.register = async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body;
+
+    if (!name || !phone || !password) {
+      return res.status(400).json({ message: "Required fields missing" });
+    }
+
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { phone }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        phone,
+        password: hashedPassword,
+        role: "CLIENT",
+      },
+    });
+
+    const token = generateToken(user);
+
+    const safeUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      createdAt: user.createdAt,
+    };
+
+    res.status(201).json({
+      message: "User registered",
+      token,
+      user: safeUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// LOGIN
+exports.login = async (req, res) => {
+  try {
+    const { email, phone, password } = req.body;
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { phone }],
+      },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = generateToken(user);
+
+    const safeUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      createdAt: user.createdAt,
+    };
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: safeUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
